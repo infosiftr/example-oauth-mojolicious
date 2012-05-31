@@ -13,7 +13,7 @@ my $clientSecret = shift || 'jkl;';
 my $apiEndpoint = shift || '/api/ping';
 my $listen = shift || 'http://*:3001';
 
-sub client {
+helper client => sub {
 	my $self = shift;
 	
 	return Net::OAuth::Client->new(
@@ -28,7 +28,7 @@ sub client {
 get '/' => sub {
 	my $self = shift;
 	
-	my $client = client($self);
+	my $client = $self->client;
 	
 	$self->redirect_to($client->authorize_url);
 };
@@ -36,7 +36,7 @@ get '/' => sub {
 get '/callback' => sub {
 	my $self = shift;
 	
-	my $client = client($self);
+	my $client = $self->client;
 	
 	my $access = $client->get_access_token($self->param('oauth_token'), $self->param('oauth_verifier'));
 	
@@ -49,7 +49,7 @@ get '/callback' => sub {
 get '/access' => sub {
 	my $self = shift;
 	
-	my $client = client($self);
+	my $client = $self->client;
 	my $access = Net::OAuth::AccessToken->new(
 		client => $client,
 		token => $self->param('token'),
