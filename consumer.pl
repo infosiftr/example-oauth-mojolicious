@@ -23,7 +23,7 @@ helper client => sub {
 		callback => $self->url_for('/callback')->to_abs,
 		debug => 1,
 	);
-}
+};
 
 get '/' => sub {
 	my $self = shift;
