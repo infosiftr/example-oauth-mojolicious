@@ -1,7 +1,10 @@
 var unixTimestamp = new Date().getTime() / 1000.0;
 
 var oauthNonces = {
-	_id: [ 'wIjqoS', '137131200' ], // nonce, consumerTimestamp
+	_id: {
+		nonce: 'wIjqoS',
+		timestamp: '137131200'
+	},
 	providerTimestamp: unixTimestamp,
 	token: 'hh5s93j4hdidpola',
 	consumerKey: 'dpf43f3p2l4k3l03'
