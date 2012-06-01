@@ -8,8 +8,8 @@ use Net::OAuth::Client;
 $Net::OAuth::PROTOCOL_VERSION = Net::OAuth::PROTOCOL_VERSION_1_0A;
 
 my $serviceProviderBase = shift || 'http://localhost';
-my $clientId = shift || 'asdf';
-my $clientSecret = shift || 'jkl;';
+my $consumerKey = shift || 'asdf';
+my $consumerSecret = shift || 'jkl;';
 my $apiEndpoint = shift || '/api/ping';
 my $listen = shift || 'http://*:3001';
 
@@ -17,8 +17,8 @@ helper client => sub {
 	my $self = shift;
 	
 	return Net::OAuth::Client->new(
-		$clientId,
-		$clientSecret,
+		$consumerKey,
+		$consumerSecret,
 		site => $serviceProviderBase,
 		callback => $self->url_for('/callback')->to_abs,
 		debug => 1,
