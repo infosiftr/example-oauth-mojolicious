@@ -7,11 +7,11 @@ use Net::OAuth::Client;
 
 $Net::OAuth::PROTOCOL_VERSION = Net::OAuth::PROTOCOL_VERSION_1_0A;
 
-my $serviceProviderBase = shift || 'http://localhost';
+my $listen = shift || 'http://*:3001';
+my $serviceProviderBase = shift || 'http://localhost:3000';
 my $consumerKey = shift || 'asdf';
 my $consumerSecret = shift || 'jkl;';
 my $apiEndpoint = shift || '/api/ping';
-my $listen = shift || 'http://*:3001';
 
 helper client => sub {
 	my $self = shift;
