@@ -23,6 +23,10 @@ helper client => sub {
 		$consumerSecret,
 		site => $serviceProviderBase,
 		callback => $self->url_for('/callback')->to_abs,
+		session => sub {
+			$self->session->{tokens} ||= {};
+			$self->session->{tokens}->{$_[0]} = $_[1];
+		},
 		debug => 1,
 	);
 };
