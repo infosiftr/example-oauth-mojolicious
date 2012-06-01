@@ -1,6 +1,8 @@
 #!/usr/bin/perl -w
 use strict;
 use warnings;
+use feature ':5.12';
+use sort 'stable';
 
 use Mojolicious::Lite;
 use Net::OAuth;
