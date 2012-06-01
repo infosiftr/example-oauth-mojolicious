@@ -224,9 +224,15 @@ get '/api/ping' => sub {
 	
 	my $request = $self->handleRequest('Protected Resource');
 	
-	...;
+	my $accessToken = $self->db->oauthTokens->find_one({
+			_id => $request->{token},
+			type => 'access',
+			consumerKey => $request->consumer_key,
+		}, {
+			userId => 1,
+		});
 	
-	$self->render(json => { pong => time });
+	$self->render(json => { userId => $accessToken->{userId}, pong => time });
 };
 
 app->start(qw(daemon -l), $listen);
