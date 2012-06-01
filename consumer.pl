@@ -25,7 +25,19 @@ helper client => sub {
 		callback => $self->url_for('/callback')->to_abs,
 		session => sub {
 			$self->session->{tokens} ||= {};
-			$self->session->{tokens}->{$_[0]} = $_[1];
+			
+			if (@_ == 1) {
+				return $self->session->{tokens}->{$_[0]};
+			}
+			
+			while (@_) {
+				my $key = shift;
+				my $val = shift;
+				
+				$self->session->{tokens}->{$key} = $val;
+			}
+			
+			return $self->session->{tokens};
 		},
 		debug => 1,
 	);
