@@ -130,7 +130,6 @@ get '/oauth/request_token' => sub {
 	my $request = $self->handleRequest('Request Token');
 	
 	my ($token, $secret);
-	
 	do {
 		$token = $self->generateRandomString;
 		$secret = $self->generateRandomString;
@@ -183,7 +182,6 @@ get '/oauth/authorize' => sub {
 	
 	$self->db->oauthTokens->update({
 			_id => $requestToken->{_id},
-			type => $requestToken->{type},
 		}, {
 			'$set' => {
 				lastUsedTimestamp => time,
@@ -207,16 +205,45 @@ get '/oauth/access_token' => sub {
 	
 	my $request = $self->handleRequest('Access Token');
 	
-	my $requestToken = $self->db->find_one({
+	my $requestToken = $self->db->oauthTokens->find_one({
 			_id => $request->{token},
 			type => 'request',
+			consumerKey => $request->consumer_key,
+			userId => { '$exists' => 1 },
 		}, {
-			_id => 1,
-			consumerKey => 1,
-			callback => 1,
+			userId => 1,
 		});
 	
-	...;
+	unless (
+		$requestToken
+		&& $self->db->oauthTokens->remove({
+				_id => $requestToken->{_id},
+			}, { safe => 1 })->{n} > 0
+	) {
+		die 'invalid token';
+	}
+	
+	my ($token, $secret);
+	do {
+		$token = $self->generateRandomString;
+		$secret = $self->generateRandomString;
+	} until (
+		$self->db->oauthTokens->insert({
+				_id => $token,
+				secret => $secret,
+				type => 'access',
+				consumerKey => $request->consumer_key,
+				createTimestamp => time,
+				lastUsedTimestamp => 0,
+				userId => $requestToken->{userId},
+			}, { safe => 1 })
+	);
+	
+	$self->handleResponse(
+		'Access Token',
+		token => $token,
+		token_secret => $secret,
+	);
 };
 
 get '/api/ping' => sub {
@@ -228,6 +255,7 @@ get '/api/ping' => sub {
 			_id => $request->{token},
 			type => 'access',
 			consumerKey => $request->consumer_key,
+			userId => { '$exists' => 1 },
 		}, {
 			userId => 1,
 		});
