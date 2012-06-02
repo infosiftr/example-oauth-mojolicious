@@ -7,6 +7,8 @@ use sort 'stable';
 use Mojolicious::Lite;
 use Net::OAuth::Client;
 
+# TODO write and use a new Net::OAuth::MojoClient module that uses Mojo::UserAgent and accepts more options like whether to make the request use the Authorization header instead of query parameters
+
 $Net::OAuth::PROTOCOL_VERSION = Net::OAuth::PROTOCOL_VERSION_1_0A;
 
 my $listen = shift || 'http://*:3001';
