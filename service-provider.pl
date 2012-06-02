@@ -95,6 +95,17 @@ helper handleRequest => sub {
 		die 'invalid nonce/timestamp'; # already been used
 	}
 	
+	if ($request->{token}) {
+		# if this token is in the database, we should update it's lastUsedTimestamp value
+		$self->db->oauthTokens->update({
+				_id => $request->{token},
+			}, {
+				'$set' => {
+					lastUsedTimestamp => time,
+				},
+			}, { safe => 1 });
+	}
+	
 	return $request;
 };
 
@@ -184,7 +195,6 @@ get '/oauth/authorize' => sub {
 			_id => $requestToken->{_id},
 		}, {
 			'$set' => {
-				lastUsedTimestamp => time,
 				verifier => $verifier,
 				userId => $userId,
 			},
