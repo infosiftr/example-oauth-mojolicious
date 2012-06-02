@@ -74,7 +74,7 @@ get '/access' => sub {
 		token_secret => $self->param('secret'),
 	);
 	
-	my $response = $access->get('/oauth/get_user');
+	my $response = $access->get($apiEndpoint);
 	
 	if ($response->is_success) {
 		$self->render(json => Mojo::JSON->decode($response->decoded_content));
