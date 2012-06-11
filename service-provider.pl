@@ -52,6 +52,9 @@ helper handleRequest => sub {
 	
 	my $request = Net::OAuth->request($type);
 	
+	# work around issues with silly libraries adding a silly oauth_body_hash parameter that isn't in any final version of any of the specs
+	$request->add_optional_message_params(qw( body_hash ));
+	
 	if (my $authHeader = $self->req->headers->authorization) {
 		# if we have an Authorization header, that is ALWAYS the preferred method
 		$request = $request->from_authorization_header($authHeader, %apiParams);
