@@ -205,6 +205,11 @@ get '/oauth/authorize' => sub {
 			safe => 1,
 		});
 	
+	if ($requestToken->{callback} eq 'oob') {
+		$self->render(text => 'Verifier: ' . $verifier);
+		return;
+	}
+	
 	my $callback = Mojo::URL->new($requestToken->{callback});
 	$callback->query->append(
 		oauth_token => $requestToken->{_id},
@@ -235,6 +240,8 @@ get '/oauth/access_token' => sub {
 	) {
 		die 'invalid token';
 	}
+	
+	# TODO reissue access tokens for the same userId/consumerKey combination
 	
 	my ($token, $secret);
 	do {
