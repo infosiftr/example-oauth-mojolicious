@@ -241,23 +241,36 @@ get '/oauth/access_token' => sub {
 		die 'invalid token';
 	}
 	
-	# TODO reissue access tokens for the same userId/consumerKey combination
+	my $accessToken = $self->db->oauthTokens->find_one({
+			type => 'access',
+			consumerKey => $request->consumer_key,
+			userId => $requestToken->{userId},
+		}, {
+			_id => 1,
+			secret => 1,
+		});
 	
 	my ($token, $secret);
-	do {
-		$token = $self->generateRandomString;
-		$secret = $self->generateRandomString;
-	} until (
-		$self->db->oauthTokens->insert({
-				_id => $token,
-				secret => $secret,
-				type => 'access',
-				consumerKey => $request->consumer_key,
-				createTimestamp => time,
-				lastUsedTimestamp => 0,
-				userId => $requestToken->{userId},
-			}, { safe => 1 })
-	);
+	if ($accessToken) {
+		$token = $accessToken->{_id};
+		$secret = $accessToken->{secret};
+	}
+	else {
+		do {
+			$token = $self->generateRandomString;
+			$secret = $self->generateRandomString;
+		} until (
+			$self->db->oauthTokens->insert({
+					_id => $token,
+					secret => $secret,
+					type => 'access',
+					consumerKey => $request->consumer_key,
+					createTimestamp => time,
+					lastUsedTimestamp => 0,
+					userId => $requestToken->{userId},
+				}, { safe => 1 })
+		);
+	}
 	
 	$self->handleResponse(
 		'Access Token',
